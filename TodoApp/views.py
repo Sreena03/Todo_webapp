@@ -6,8 +6,9 @@ from django.contrib.auth import authenticate,login,logout
 from TodoApp.models import Task
 from django.contrib import messages
 from django.utils.decorators import method_decorator
-
-
+from django.conf import settings
+from django.core.mail import send_mail
+# siV@12
 def sigin_required(fn):
     def wrapper(request,*args,**kwargs):
         if not request.user.is_authenticated:
@@ -56,11 +57,17 @@ class Signview(View):
             print(form.cleaned_data)
             user_name=form.cleaned_data.get("Username")
             pass_word=form.cleaned_data.get("Password")
-            User_obj=authenticate(request,username=user_name,password=pass_word)
+            email=form.cleaned_data.get("email")
+            User_obj=authenticate(request,username=user_name,password=pass_word,email=email)
             if User_obj:
                 print(User_obj)
                 print("Valid Credential")
                 login(request,User_obj)
+                subject = "registration completed "
+                message = "login successfully completed"
+                email_from = settings.EMAIL_HOST_USER
+                recipient_list = [User_obj.email]
+                send_mail(subject,message,email_from,recipient_list)
                 return redirect("index")
             else:
                 print("Invalid Credential")
@@ -133,3 +140,5 @@ class User_del(View):
         id=kwargs.get('pk')
         User.objects.get(id=id).delete()
         return redirect("reg")
+    
+

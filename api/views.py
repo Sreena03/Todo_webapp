@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ViewSet
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from TodoApp.models import Task
-from api.serializer import Task_serializer
+from api.serializer import Task_serializer,userserializer
 from rest_framework import authentication,permissions
 
 
@@ -48,7 +49,16 @@ class Taskviewsetview(ViewSet):
         return Response(serializers.errors)
 
     
-    
+class SignUpView(APIView):
+    def post(self,request,*args,**kwargs):
+        serializer = userserializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        
+        else:
+            return Response(data = serializer.errors)
+
     
     
     
